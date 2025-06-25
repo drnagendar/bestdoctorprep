@@ -1,4 +1,4 @@
-export default function Home() {
+<h1>Hello from BestDoctorPrep!</h1>export default function Home() {
 return (
 
 {/* Header */}
