@@ -1,8 +1,11 @@
 // File: app/admin/page.tsx
 "use client";
 
-import { useState } from "react";
+"use client";
+import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { collection, addDoc, getDocs } from "firebase/firestore";
+import { db } from "@/firebaseConfig";
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -13,6 +16,25 @@ export default function AdminPage() {
     answer: "",
     topic: "",
   });
+
+useEffect(() => {
+  const fetchFlashcards = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "flashcards"));
+      const fetchedCards: any[] = [];
+      querySnapshot.forEach((doc) => {
+        fetchedCards.push({ id: doc.id, ...doc.data() });
+      });
+      setFlashcards(fetchedCards.reverse()); // Show latest first
+    } catch (error) {
+      console.error("Error fetching flashcards: ", error);
+    }
+  };
+
+  if (isAuthenticated) {
+    fetchFlashcards();
+  }
+}, [isAuthenticated]);
 
   const handleLogin = () => {
     if (password === "bestdoctorprep") {
@@ -26,18 +48,30 @@ export default function AdminPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleAddFlashcard = () => {
-    if (!formData.question || !formData.answer) {
-      alert("Please fill out both question and answer");
-      return;
-    }
-    const newCard = {
-      id: uuidv4().slice(0, 8),
-      ...formData,
-    };
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "@/firebaseConfig"; // Adjust the path if needed
+
+const handleAddFlashcard = async () => {
+  if (!formData.question || !formData.answer) {
+    alert("Please fill out both question and answer");
+    return;
+  }
+
+  const newCard = {
+    id: uuidv4().slice(0, 8),
+    ...formData,
+    createdAt: new Date().toISOString(),
+  };
+
+  try {
+    await addDoc(collection(db, "flashcards"), newCard);
     setFlashcards([newCard, ...flashcards]);
     setFormData({ question: "", answer: "", topic: "" });
-  };
+  } catch (err) {
+    console.error("Error adding document: ", err);
+    alert("Failed to save flashcard. Try again.");
+  }
+};
 
   if (!isAuthenticated) {
     return (
