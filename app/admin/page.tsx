@@ -47,9 +47,6 @@ useEffect(() => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "@/firebaseConfig"; // Adjust the path if needed
-
 const handleAddFlashcard = async () => {
   if (!formData.question || !formData.answer) {
     alert("Please fill out both question and answer");
