@@ -1,5 +1,4 @@
 // File: app/admin/page.tsx
-"use client";
 
 "use client";
 import { useState, useEffect } from "react";
