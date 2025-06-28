@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig";
+import { doc, deleteDoc } from "firebase/firestore";
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -50,6 +51,16 @@ useEffect(() => {
 const handleAddFlashcard = async () => {
   if (!formData.question || !formData.answer) {
     alert("Please fill out both question and answer");
+
+    const handleDelete = async (id: string) => {
+  try {
+    await deleteDoc(doc(db, "flashcards", id));
+    setFlashcards(flashcards.filter((card) => card.id !== id));
+  } catch (error) {
+    console.error("Error deleting flashcard: ", error);
+    alert("Failed to delete flashcard");
+  }
+};
     return;
   }
 
@@ -129,17 +140,20 @@ const handleAddFlashcard = async () => {
       <h2 className="text-xl font-semibold mb-2">📋 Flashcards Preview</h2>
       {flashcards.length === 0 && <p>No flashcards yet.</p>}
       <ul className="space-y-2">
-        {flashcards.map((card) => (
-          <li
-            key={card.id}
-            className="border p-3 rounded shadow-sm bg-white"
-          >
-            <div className="text-sm text-gray-500">ID: {card.id}</div>
-            <div className="font-semibold">Q: {card.question}</div>
-            <div>A: {card.answer}</div>
-            <div className="text-sm italic text-gray-600">Topic: {card.topic}</div>
-          </li>
-        ))}
+{flashcards.map((card) => (
+  <li key={card.id} className="border p-3 rounded shadow-sm bg-white">
+    <div className="text-sm text-gray-500">ID: {card.id}</div>
+    <div className="font-semibold">Q: {card.question}</div>
+    <div>A: {card.answer}</div>
+    <div className="text-sm italic text-gray-600">Topic: {card.topic}</div>
+    <button
+      onClick={() => handleDelete(card.id)}
+      className="mt-2 text-sm text-red-600 underline"
+    >
+      🗑️ Delete
+    </button>
+  </li>
+))}
       </ul>
     </main>
   );
