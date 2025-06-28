@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { collection, addDoc, getDocs } from "firebase/firestore";
-import { db } from "@/firebaseConfig";
+import { db } from "../firebaseConfig";
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
