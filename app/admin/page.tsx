@@ -52,6 +52,21 @@ const handleAddFlashcard = async () => {
   if (!formData.question || !formData.answer) {
     alert("Please fill out both question and answer");
 
+    import { deleteDoc, doc } from "firebase/firestore";
+
+const handleDelete = async (id: string) => {
+  const confirmDelete = confirm("Are you sure you want to delete this flashcard?");
+  if (!confirmDelete) return;
+
+  try {
+    await deleteDoc(doc(db, "flashcards", id));
+    setFlashcards((prev) => prev.filter((card) => card.id !== id));
+  } catch (error) {
+    console.error("Error deleting flashcard:", error);
+    alert("Failed to delete flashcard. Try again.");
+  }
+};
+
     const handleDelete = async (id: string) => {
   try {
     await deleteDoc(doc(db, "flashcards", id));
