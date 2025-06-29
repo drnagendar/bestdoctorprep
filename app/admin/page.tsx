@@ -1,11 +1,17 @@
 // File: app/admin/page.tsx
-
 "use client";
 
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -16,24 +22,26 @@ export default function AdminPage() {
     answer: "",
     topic: "",
   });
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editData, setEditData] = useState({
+    question: "",
+    answer: "",
+    topic: "",
+  });
 
   useEffect(() => {
     const fetchFlashcards = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "flashcards"));
         const fetchedCards: any[] = [];
-        querySnapshot.forEach((docSnap) => {
-          fetchedCards.push({
-            firestoreId: docSnap.id,
-            ...docSnap.data(),
-          });
+        querySnapshot.forEach((doc) => {
+          fetchedCards.push({ id: doc.id, ...doc.data() });
         });
         setFlashcards(fetchedCards.reverse());
       } catch (error) {
         console.error("Error fetching flashcards: ", error);
       }
     };
-
     if (isAuthenticated) {
       fetchFlashcards();
     }
@@ -56,20 +64,14 @@ export default function AdminPage() {
       alert("Please fill out both question and answer");
       return;
     }
-
-    const shortId = uuidv4().slice(0, 8);
     const newCard = {
-      shortId,
+      id: uuidv4().slice(0, 8),
       ...formData,
       createdAt: new Date().toISOString(),
     };
-
     try {
       const docRef = await addDoc(collection(db, "flashcards"), newCard);
-      setFlashcards([
-        { firestoreId: docRef.id, ...newCard },
-        ...flashcards,
-      ]);
+      setFlashcards([{ ...newCard, id: docRef.id }, ...flashcards]);
       setFormData({ question: "", answer: "", topic: "" });
     } catch (err) {
       console.error("Error adding document: ", err);
@@ -77,16 +79,44 @@ export default function AdminPage() {
     }
   };
 
-  const handleDelete = async (firestoreId: string) => {
+  const handleDelete = async (id: string) => {
     const confirmDelete = confirm("Are you sure you want to delete this flashcard?");
     if (!confirmDelete) return;
-
     try {
-      await deleteDoc(doc(db, "flashcards", firestoreId));
-      setFlashcards((prev) => prev.filter((card) => card.firestoreId !== firestoreId));
+      await deleteDoc(doc(db, "flashcards", id));
+      setFlashcards(flashcards.filter((card) => card.id !== id));
     } catch (error) {
       console.error("Error deleting flashcard:", error);
-      alert("Failed to delete flashcard. Try again.");
+      alert("Failed to delete flashcard.");
+    }
+  };
+
+  const startEditing = (card: any) => {
+    setEditId(card.id);
+    setEditData({
+      question: card.question,
+      answer: card.answer,
+      topic: card.topic,
+    });
+  };
+
+  const handleEditChange = (e: any) => {
+    setEditData({ ...editData, [e.target.name]: e.target.value });
+  };
+
+  const saveEdit = async (id: string) => {
+    try {
+      const docRef = doc(db, "flashcards", id);
+      await updateDoc(docRef, editData);
+      setFlashcards((prev) =>
+        prev.map((card) =>
+          card.id === id ? { ...card, ...editData } : card
+        )
+      );
+      setEditId(null);
+    } catch (error) {
+      console.error("Error updating flashcard:", error);
+      alert("Failed to update flashcard.");
     }
   };
 
@@ -149,21 +179,69 @@ export default function AdminPage() {
 
       <h2 className="text-xl font-semibold mb-2">📋 Flashcards Preview</h2>
       {flashcards.length === 0 && <p>No flashcards yet.</p>}
-      <ul className="space-y-2">
+      <ul className="space-y-4">
         {flashcards.map((card) => (
-          <li key={card.firestoreId} className="border p-3 rounded shadow-sm bg-white">
-            <div className="text-sm text-gray-500">
-              ID: {card.shortId || card.firestoreId.slice(0, 8)}
-            </div>
-            <div className="font-semibold">Q: {card.question}</div>
-            <div>A: {card.answer}</div>
-            <div className="text-sm italic text-gray-600">Topic: {card.topic}</div>
-            <button
-              onClick={() => handleDelete(card.firestoreId)}
-              className="mt-2 text-sm text-red-600 underline"
-            >
-              🗑️ Delete
-            </button>
+          <li key={card.id} className="border p-3 rounded shadow-sm bg-white">
+            <div className="text-sm text-gray-500">ID: {card.id}</div>
+            {editId === card.id ? (
+              <>
+                <input
+                  type="text"
+                  name="question"
+                  value={editData.question}
+                  onChange={handleEditChange}
+                  className="border rounded px-2 py-1 w-full mb-2"
+                />
+                <input
+                  type="text"
+                  name="answer"
+                  value={editData.answer}
+                  onChange={handleEditChange}
+                  className="border rounded px-2 py-1 w-full mb-2"
+                />
+                <input
+                  type="text"
+                  name="topic"
+                  value={editData.topic}
+                  onChange={handleEditChange}
+                  className="border rounded px-2 py-1 w-full mb-2"
+                />
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => saveEdit(card.id)}
+                    className="text-green-600 underline text-sm"
+                  >
+                    ✅ Save
+                  </button>
+                  <button
+                    onClick={() => setEditId(null)}
+                    className="text-gray-600 underline text-sm"
+                  >
+                    ❌ Cancel
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="font-semibold">Q: {card.question}</div>
+                <div>A: {card.answer}</div>
+                <div className="text-sm italic text-gray-600">Topic: {card.topic}</div>
+                <div className="mt-2 space-x-4 text-sm">
+                  <button
+                    onClick={() => startEditing(card)}
+                    className="text-blue-600 underline"
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(card.id)}
+                    className="text-red-600 underline"
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
+              </>
+            )}
           </li>
         ))}
       </ul>
