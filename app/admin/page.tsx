@@ -1,15 +1,8 @@
+// File: app/admin/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  updateDoc,
-  doc,
-} from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 export default function AdminPage() {
@@ -21,28 +14,21 @@ export default function AdminPage() {
     answer: "",
     topic: "",
   });
-
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editData, setEditData] = useState({
-    question: "",
-    answer: "",
-    topic: "",
-  });
+  const [editId, setEditId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchFlashcards = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "flashcards"));
         const fetchedCards: any[] = [];
-        querySnapshot.forEach((doc) => {
-          fetchedCards.push({ id: doc.id, ...doc.data() });
+        querySnapshot.forEach((docSnap) => {
+          fetchedCards.push({ id: docSnap.id, ...docSnap.data() }); // use Firestore doc ID
         });
         setFlashcards(fetchedCards.reverse());
       } catch (error) {
         console.error("Error fetching flashcards: ", error);
       }
     };
-
     if (isAuthenticated) {
       fetchFlashcards();
     }
@@ -66,73 +52,58 @@ export default function AdminPage() {
       return;
     }
 
-    const newCard = {
-      uuid: uuidv4().slice(0, 8),
-      ...formData,
-      createdAt: new Date().toISOString(),
-    };
-
-    try {
-      const docRef = await addDoc(collection(db, "flashcards"), newCard);
-      setFlashcards([{ id: docRef.id, ...newCard }, ...flashcards]);
-      setFormData({ question: "", answer: "", topic: "" });
-    } catch (err) {
-      console.error("Error adding document: ", err);
-      alert("Failed to save flashcard. Try again.");
+    if (editId) {
+      // 🔁 UPDATE mode
+      try {
+        const docRef = doc(db, "flashcards", editId);
+        await updateDoc(docRef, {
+          ...formData,
+        });
+        setFlashcards((prev) =>
+          prev.map((card) =>
+            card.id === editId ? { ...card, ...formData } : card
+          )
+        );
+        setEditId(null);
+        setFormData({ question: "", answer: "", topic: "" });
+      } catch (err) {
+        console.error("Error updating document: ", err);
+        alert("Failed to update flashcard.");
+      }
+    } else {
+      // ➕ ADD mode
+      try {
+        const docRef = await addDoc(collection(db, "flashcards"), {
+          ...formData,
+          createdAt: new Date().toISOString(),
+        });
+        setFlashcards([{ id: docRef.id, ...formData }, ...flashcards]);
+        setFormData({ question: "", answer: "", topic: "" });
+      } catch (err) {
+        console.error("Error adding document: ", err);
+        alert("Failed to save flashcard.");
+      }
     }
   };
 
   const handleDelete = async (id: string) => {
-    const confirmDelete = confirm("Are you sure you want to delete this flashcard?");
-    if (!confirmDelete) return;
-
+    if (!confirm("Delete this flashcard?")) return;
     try {
       await deleteDoc(doc(db, "flashcards", id));
       setFlashcards((prev) => prev.filter((card) => card.id !== id));
     } catch (error) {
-      console.error("Error deleting flashcard:", error);
-      alert("Failed to delete flashcard. Try again.");
+      console.error("Error deleting flashcard: ", error);
+      alert("Failed to delete flashcard.");
     }
   };
 
   const handleEdit = (card: any) => {
-    setEditingId(card.id);
-    setEditData({
+    setFormData({
       question: card.question,
       answer: card.answer,
-      topic: card.topic || "",
+      topic: card.topic,
     });
-  };
-
-  const handleUpdate = async () => {
-    if (!editData.question || !editData.answer || !editingId) {
-      alert("Please fill out both question and answer");
-      return;
-    }
-
-    try {
-      const cardRef = doc(db, "flashcards", editingId);
-      await updateDoc(cardRef, {
-        question: editData.question,
-        answer: editData.answer,
-        topic: editData.topic,
-      });
-
-      setFlashcards((prev) =>
-        prev.map((card) =>
-          card.id === editingId ? { ...card, ...editData } : card
-        )
-      );
-      cancelEditing();
-    } catch (error) {
-      console.error("Error updating flashcard:", error);
-      alert("Failed to update flashcard");
-    }
-  };
-
-  const cancelEditing = () => {
-    setEditingId(null);
-    setEditData({ question: "", answer: "", topic: "" });
+    setEditId(card.id);
   };
 
   if (!isAuthenticated) {
@@ -158,7 +129,9 @@ export default function AdminPage() {
 
   return (
     <main className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">🧠 Add New Flashcard</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        {editId ? "✏️ Edit Flashcard" : "🧠 Add New Flashcard"}
+      </h1>
       <div className="space-y-3 mb-6">
         <input
           type="text"
@@ -188,7 +161,7 @@ export default function AdminPage() {
           onClick={handleAddFlashcard}
           className="bg-green-600 text-white px-4 py-2 rounded"
         >
-          ➕ Add Flashcard
+          {editId ? "✅ Update Flashcard" : "➕ Add Flashcard"}
         </button>
       </div>
 
@@ -196,78 +169,27 @@ export default function AdminPage() {
       {flashcards.length === 0 && <p>No flashcards yet.</p>}
       <ul className="space-y-2">
         {flashcards.map((card) => (
-          <li
-            key={card.id}
-            className="border p-3 rounded shadow-sm bg-white"
-          >
-            <div className="text-sm text-gray-500">
-              ID: {card.uuid || card.id}
+          <li key={card.id} className="border p-3 rounded shadow-sm bg-white">
+            <div className="text-sm text-gray-500">ID: {card.id}</div>
+            <div className="font-semibold">Q: {card.question}</div>
+            <div>A: {card.answer}</div>
+            <div className="text-sm italic text-gray-600">
+              Topic: {card.topic}
             </div>
-            {editingId === card.id ? (
-              <>
-                <input
-                  type="text"
-                  name="question"
-                  className="border px-2 py-1 w-full mb-1"
-                  value={editData.question}
-                  onChange={(e) =>
-                    setEditData({ ...editData, question: e.target.value })
-                  }
-                />
-                <input
-                  type="text"
-                  name="answer"
-                  className="border px-2 py-1 w-full mb-1"
-                  value={editData.answer}
-                  onChange={(e) =>
-                    setEditData({ ...editData, answer: e.target.value })
-                  }
-                />
-                <input
-                  type="text"
-                  name="topic"
-                  className="border px-2 py-1 w-full mb-2"
-                  value={editData.topic}
-                  onChange={(e) =>
-                    setEditData({ ...editData, topic: e.target.value })
-                  }
-                />
-                <button
-                  onClick={handleUpdate}
-                  className="text-sm bg-blue-500 text-white px-3 py-1 rounded mr-2"
-                >
-                  ✅ Update
-                </button>
-                <button
-                  onClick={cancelEditing}
-                  className="text-sm text-gray-600 underline"
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <>
-                <div className="font-semibold">Q: {card.question}</div>
-                <div>A: {card.answer}</div>
-                <div className="text-sm italic text-gray-600">
-                  Topic: {card.topic}
-                </div>
-                <div className="mt-2 space-x-3">
-                  <button
-                    onClick={() => handleEdit(card)}
-                    className="text-sm text-blue-600 underline"
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(card.id)}
-                    className="text-sm text-red-600 underline"
-                  >
-                    🗑️ Delete
-                  </button>
-                </div>
-              </>
-            )}
+            <div className="flex space-x-4 mt-2">
+              <button
+                onClick={() => handleEdit(card)}
+                className="text-blue-600 text-sm underline"
+              >
+                ✏️ Edit
+              </button>
+              <button
+                onClick={() => handleDelete(card.id)}
+                className="text-red-600 text-sm underline"
+              >
+                🗑️ Delete
+              </button>
+            </div>
           </li>
         ))}
       </ul>
