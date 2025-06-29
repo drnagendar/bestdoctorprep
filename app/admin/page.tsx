@@ -1,15 +1,8 @@
-"use client";
+// File: app/admin/page.tsx
 
+"use client";
 import { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 export default function AdminPage() {
@@ -21,7 +14,6 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!isAuthenticated) return;
-
     const fetchFlashcards = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "flashcards"));
@@ -29,12 +21,11 @@ export default function AdminPage() {
         querySnapshot.forEach((docSnap) => {
           cards.push({ id: docSnap.id, ...docSnap.data() });
         });
-        setFlashcards(cards.reverse()); // newest on top
+        setFlashcards(cards.reverse());
       } catch (err) {
         console.error("Error loading flashcards:", err);
       }
     };
-
     fetchFlashcards();
   }, [isAuthenticated]);
 
@@ -56,49 +47,39 @@ export default function AdminPage() {
       alert("Please fill in both question and answer.");
       return;
     }
-
     try {
       if (editId) {
-        // UPDATE
         const cardRef = doc(db, "flashcards", editId);
         await updateDoc(cardRef, { question, answer, topic });
         setFlashcards((prev) =>
-          prev.map((card) =>
-            card.id === editId ? { ...card, question, answer, topic } : card
-          )
+          prev.map((card) => (card.id === editId ? { ...card, question, answer, topic } : card))
         );
         setEditId(null);
       } else {
-        // ADD NEW
         const newCard = { question, answer, topic };
         const docRef = await addDoc(collection(db, "flashcards"), newCard);
         setFlashcards([{ id: docRef.id, ...newCard }, ...flashcards]);
       }
       setFormData({ question: "", answer: "", topic: "" });
-    } catch (err: any) {
-      console.error("Error saving flashcard:", err.message || err);
-      alert(`Failed to save flashcard: ${err.message || err}`);
+    } catch (err) {
+      console.error("Failed to save flashcard:", err);
+      alert("Failed to save flashcard.");
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this flashcard?")) return;
-
     try {
       await deleteDoc(doc(db, "flashcards", id));
-      setFlashcards((prev) => prev.filter((card) => card.id !== id));
+      setFlashcards(flashcards.filter((card) => card.id !== id));
     } catch (err) {
-      console.error("Error deleting flashcard:", err);
+      console.error("Error deleting:", err);
       alert("Delete failed.");
     }
   };
 
   const handleEdit = (card: any) => {
-    setFormData({
-      question: card.question,
-      answer: card.answer,
-      topic: card.topic || "",
-    });
+    setFormData({ question: card.question, answer: card.answer, topic: card.topic });
     setEditId(card.id);
   };
 
