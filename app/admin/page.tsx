@@ -1,21 +1,29 @@
-// File: app/admin/page.tsx
 "use client";
-
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [flashcards, setFlashcards] = useState<any[]>([]);
-  const [formData, setFormData] = useState({ question: "", answer: "", topic: "" });
+  const [formData, setFormData] = useState({
+    question: "",
+    answer: "",
+    topic: "",
+  });
   const [editId, setEditId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) return;
-
     const fetchFlashcards = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "flashcards"));
@@ -23,12 +31,11 @@ export default function AdminPage() {
         querySnapshot.forEach((docSnap) => {
           cards.push({ id: docSnap.id, ...docSnap.data() });
         });
-        setFlashcards(cards.reverse()); // newest on top
+        setFlashcards(cards.reverse());
       } catch (err) {
         console.error("Error loading flashcards:", err);
       }
     };
-
     fetchFlashcards();
   }, [isAuthenticated]);
 
@@ -53,18 +60,20 @@ export default function AdminPage() {
 
     try {
       if (editId) {
-        // UPDATE EXISTING
         const cardRef = doc(db, "flashcards", editId);
         await updateDoc(cardRef, { question, answer, topic });
         setFlashcards((prev) =>
-          prev.map((card) => (card.id === editId ? { ...card, question, answer, topic } : card))
+          prev.map((card) =>
+            card.id === editId ? { ...card, question, answer, topic } : card
+          )
         );
+        alert("✅ Flashcard updated successfully");
         setEditId(null);
       } else {
-        // ADD NEW
         const newCard = { question, answer, topic };
         const docRef = await addDoc(collection(db, "flashcards"), newCard);
         setFlashcards([{ id: docRef.id, ...newCard }, ...flashcards]);
+        alert("✅ Flashcard added successfully");
       }
 
       setFormData({ question: "", answer: "", topic: "" });
@@ -78,7 +87,8 @@ export default function AdminPage() {
     if (!confirm("Are you sure you want to delete this flashcard?")) return;
     try {
       await deleteDoc(doc(db, "flashcards", id));
-      setFlashcards(flashcards.filter((card) => card.id !== id));
+      setFlashcards((prev) => prev.filter((card) => card.id !== id));
+      alert("🗑️ Flashcard deleted");
     } catch (err) {
       console.error("Error deleting:", err);
       alert("Delete failed.");
@@ -86,7 +96,11 @@ export default function AdminPage() {
   };
 
   const handleEdit = (card: any) => {
-    setFormData({ question: card.question, answer: card.answer, topic: card.topic });
+    setFormData({
+      question: card.question,
+      answer: card.answer,
+      topic: card.topic,
+    });
     setEditId(card.id);
   };
 
@@ -116,7 +130,6 @@ export default function AdminPage() {
       <h1 className="text-2xl font-bold mb-4">
         🧠 {editId ? "Edit Flashcard" : "Add New Flashcard"}
       </h1>
-
       <div className="space-y-3 mb-6">
         <input
           type="text"
@@ -155,12 +168,16 @@ export default function AdminPage() {
         <p>No flashcards yet.</p>
       ) : (
         <ul className="space-y-2">
-          {flashcards.map((card) => (
+          {flashcards.map((card, index) => (
             <li key={card.id} className="border p-3 rounded shadow-sm bg-white">
-              <div className="text-sm text-gray-500">ID: {card.id}</div>
+              <div className="text-sm text-gray-500">
+                ID: {index + 1} — {card.id}
+              </div>
               <div className="font-semibold">Q: {card.question}</div>
               <div>A: {card.answer}</div>
-              <div className="text-sm italic text-gray-600">Topic: {card.topic}</div>
+              <div className="text-sm italic text-gray-600">
+                Topic: {card.topic}
+              </div>
               <div className="mt-2 flex gap-3">
                 <button
                   onClick={() => handleEdit(card)}
