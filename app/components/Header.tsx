@@ -3,53 +3,51 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
-import { auth } from "@/firebaseConfig";
+import { auth } from "../../firebaseConfig"; // ✅ Corrected path
 
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, setUser);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
     return () => unsubscribe();
   }, []);
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      window.location.href = "/";
     } catch (error) {
-      console.error("Logout failed", error);
+      console.error("Logout failed:", error);
       alert("Logout failed");
     }
   };
 
   return (
-    <header className="flex justify-between items-center px-6 py-4 bg-gray-100 shadow">
-      <Link href="/" className="text-xl font-bold text-blue-600">
+    <header className="flex items-center justify-between p-4 bg-gray-800 text-white">
+      <Link href="/" className="text-xl font-bold">
         BestDoctorPrep
       </Link>
-      <div>
+      <nav className="space-x-4">
         {user ? (
           <>
-            <span className="mr-4 text-sm text-gray-700">
-              {user.email}
-            </span>
-            <button
-              onClick={handleLogout}
-              className="text-sm text-red-600 underline"
-            >
-              🔓 Logout
+            <span>{user.email}</span>
+            <button onClick={handleLogout} className="underline text-sm">
+              Logout
             </button>
           </>
         ) : (
-          <Link
-            href="/(auth)/login"
-            className="text-sm text-blue-600 underline"
-          >
-            🔐 Login
-          </Link>
+          <>
+            <Link href="/(auth)/login" className="underline text-sm">
+              Login
+            </Link>
+            <Link href="/(auth)/signup" className="underline text-sm">
+              Signup
+            </Link>
+          </>
         )}
-      </div>
+      </nav>
     </header>
   );
 }
