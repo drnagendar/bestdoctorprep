@@ -2,7 +2,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 export default function AdminPage() {
@@ -16,24 +23,23 @@ export default function AdminPage() {
   });
   const [editId, setEditId] = useState<string | null>(null);
 
+  // 🔁 Load flashcards
   useEffect(() => {
     const fetchFlashcards = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "flashcards"));
-        const fetchedCards: any[] = [];
-        querySnapshot.forEach((docSnap) => {
-          fetchedCards.push({ id: docSnap.id, ...docSnap.data() }); // use Firestore doc ID
-        });
-        setFlashcards(fetchedCards.reverse());
-      } catch (error) {
-        console.error("Error fetching flashcards: ", error);
-      }
+      const querySnapshot = await getDocs(collection(db, "flashcards"));
+      const cards: any[] = [];
+      querySnapshot.forEach((docSnap) => {
+        cards.push({ id: docSnap.id, ...docSnap.data() }); // use Firestore ID
+      });
+      setFlashcards(cards.reverse());
     };
+
     if (isAuthenticated) {
       fetchFlashcards();
     }
   }, [isAuthenticated]);
 
+  // 🔒 Login check
   const handleLogin = () => {
     if (password === "bestdoctorprep") {
       setIsAuthenticated(true);
@@ -42,70 +48,78 @@ export default function AdminPage() {
     }
   };
 
+  // 📥 Input form
   const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // ➕ or ✏️ Add / Update flashcard
   const handleAddFlashcard = async () => {
-    if (!formData.question || !formData.answer) {
-      alert("Please fill out both question and answer");
+    const { question, answer, topic } = formData;
+    if (!question || !answer) {
+      alert("Please enter both question and answer.");
       return;
     }
 
     if (editId) {
-      // 🔁 UPDATE mode
+      // ✏️ Update
       try {
         const docRef = doc(db, "flashcards", editId);
-        await updateDoc(docRef, {
-          ...formData,
-        });
+        await updateDoc(docRef, { question, answer, topic });
         setFlashcards((prev) =>
           prev.map((card) =>
-            card.id === editId ? { ...card, ...formData } : card
+            card.id === editId ? { ...card, question, answer, topic } : card
           )
         );
         setEditId(null);
         setFormData({ question: "", answer: "", topic: "" });
-      } catch (err) {
-        console.error("Error updating document: ", err);
+      } catch (error) {
+        console.error("Update failed", error);
         alert("Failed to update flashcard.");
       }
     } else {
-      // ➕ ADD mode
+      // ➕ Add
       try {
         const docRef = await addDoc(collection(db, "flashcards"), {
-          ...formData,
+          question,
+          answer,
+          topic,
           createdAt: new Date().toISOString(),
         });
-        setFlashcards([{ id: docRef.id, ...formData }, ...flashcards]);
+        setFlashcards([{ id: docRef.id, question, answer, topic }, ...flashcards]);
         setFormData({ question: "", answer: "", topic: "" });
-      } catch (err) {
-        console.error("Error adding document: ", err);
+      } catch (error) {
+        console.error("Add failed", error);
         alert("Failed to save flashcard.");
       }
     }
   };
 
+  // 🗑️ Delete
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this flashcard?")) return;
+    const confirmDelete = confirm("Delete this flashcard?");
+    if (!confirmDelete) return;
+
     try {
       await deleteDoc(doc(db, "flashcards", id));
       setFlashcards((prev) => prev.filter((card) => card.id !== id));
     } catch (error) {
-      console.error("Error deleting flashcard: ", error);
+      console.error("Delete failed", error);
       alert("Failed to delete flashcard.");
     }
   };
 
+  // ✏️ Start editing
   const handleEdit = (card: any) => {
+    setEditId(card.id);
     setFormData({
       question: card.question,
       answer: card.answer,
       topic: card.topic,
     });
-    setEditId(card.id);
   };
 
+  // 🔐 Login page
   if (!isAuthenticated) {
     return (
       <main className="p-6 max-w-md mx-auto text-center">
@@ -127,11 +141,13 @@ export default function AdminPage() {
     );
   }
 
+  // 🧠 Admin dashboard
   return (
     <main className="p-6 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">
         {editId ? "✏️ Edit Flashcard" : "🧠 Add New Flashcard"}
       </h1>
+
       <div className="space-y-3 mb-6">
         <input
           type="text"
@@ -173,9 +189,7 @@ export default function AdminPage() {
             <div className="text-sm text-gray-500">ID: {card.id}</div>
             <div className="font-semibold">Q: {card.question}</div>
             <div>A: {card.answer}</div>
-            <div className="text-sm italic text-gray-600">
-              Topic: {card.topic}
-            </div>
+            <div className="text-sm italic text-gray-600">Topic: {card.topic}</div>
             <div className="flex space-x-4 mt-2">
               <button
                 onClick={() => handleEdit(card)}
