@@ -12,7 +12,6 @@ export default function Header() {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
     });
-
     return () => unsubscribe();
   }, []);
 
@@ -44,12 +43,20 @@ export default function Header() {
             </button>
           </>
         ) : (
-          <Link
-            href="/login"
-            className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
-          >
-            Login
-          </Link>
+          <>
+            <Link
+              href="/login"
+              className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
+            >
+              Login
+            </Link>
+            <Link
+              href="/register"
+              className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
+            >
+              Register
+            </Link>
+          </>
         )}
       </nav>
     </header>
