@@ -1,6 +1,6 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
-import Header from "../components/Header";
+import Header from "./components/Header"; // ✅ Corrected relative path
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,7 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Header />
-        <main className="max-w-5xl mx-auto px-4 mt-6">{children}</main>
+        <main className="max-w-5xl mx-auto px-4 py-6">{children}</main>
       </body>
     </html>
   );
