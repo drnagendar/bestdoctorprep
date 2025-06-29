@@ -21,25 +21,23 @@ export default function AdminPage() {
     topic: "",
   });
 
-  // ✅ Fetch flashcards from Firestore
   useEffect(() => {
     const fetchFlashcards = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "flashcards"));
         const cards: any[] = [];
         querySnapshot.forEach((docSnap) => {
-          cards.push({ id: docSnap.id, ...docSnap.data() });
+          cards.push({ firestoreId: docSnap.id, ...docSnap.data() });
         });
         setFlashcards(cards.reverse());
       } catch (err) {
-        console.error("Fetch error", err);
+        console.error("Error fetching flashcards:", err);
       }
     };
 
     if (isAuthenticated) fetchFlashcards();
   }, [isAuthenticated]);
 
-  // ✅ Login
   const handleLogin = () => {
     if (password === "bestdoctorprep") {
       setIsAuthenticated(true);
@@ -48,12 +46,10 @@ export default function AdminPage() {
     }
   };
 
-  // ✅ Input handler
   const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ Add flashcard
   const handleAddFlashcard = async () => {
     if (!formData.question || !formData.answer) {
       alert("Please fill out both question and answer");
@@ -69,24 +65,23 @@ export default function AdminPage() {
 
     try {
       const docRef = await addDoc(collection(db, "flashcards"), newCard);
-      setFlashcards([{ id: docRef.id, ...newCard }, ...flashcards]);
+      setFlashcards([{ firestoreId: docRef.id, ...newCard }, ...flashcards]);
       setFormData({ question: "", answer: "", topic: "" });
     } catch (err) {
-      console.error("Add error", err);
+      console.error("Error adding flashcard:", err);
       alert("Failed to save flashcard");
     }
   };
 
-  // ✅ Delete flashcard
-  const handleDelete = async (docId: string) => {
+  const handleDelete = async (firestoreId: string) => {
     const confirmDelete = confirm("Are you sure you want to delete this flashcard?");
     if (!confirmDelete) return;
 
     try {
-      await deleteDoc(doc(db, "flashcards", docId));
-      setFlashcards((prev) => prev.filter((card) => card.id !== docId));
+      await deleteDoc(doc(db, "flashcards", firestoreId));
+      setFlashcards((prev) => prev.filter((card) => card.firestoreId !== firestoreId));
     } catch (err) {
-      console.error("Delete error", err);
+      console.error("Error deleting flashcard:", err);
       alert("Failed to delete flashcard");
     }
   };
@@ -155,7 +150,7 @@ export default function AdminPage() {
       <ul className="space-y-2">
         {flashcards.map((card) => (
           <li
-            key={card.id}
+            key={card.firestoreId}
             className="border p-3 rounded shadow-sm bg-white"
           >
             <div className="text-sm text-gray-500">ID: {card.shortId}</div>
@@ -163,7 +158,7 @@ export default function AdminPage() {
             <div>A: {card.answer}</div>
             <div className="text-sm italic text-gray-600">Topic: {card.topic}</div>
             <button
-              onClick={() => handleDelete(card.id)}
+              onClick={() => handleDelete(card.firestoreId)}
               className="mt-2 text-sm text-red-600 underline"
             >
               🗑️ Delete
