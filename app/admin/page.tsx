@@ -1,8 +1,14 @@
-// File: app/admin/page.tsx
-
 "use client";
+
 import { useState, useEffect } from "react";
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 export default function AdminPage() {
@@ -16,25 +22,22 @@ export default function AdminPage() {
     if (!isAuthenticated) return;
     const fetchFlashcards = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "flashcards"));
-        const cards: any[] = [];
-        querySnapshot.forEach((docSnap) => {
-          cards.push({ id: docSnap.id, ...docSnap.data() });
-        });
+        const snapshot = await getDocs(collection(db, "flashcards"));
+        const cards = snapshot.docs.map((docSnap) => ({
+          docId: docSnap.id,
+          ...docSnap.data(),
+        }));
         setFlashcards(cards.reverse());
-      } catch (err) {
-        console.error("Error loading flashcards:", err);
+      } catch (error) {
+        console.error("Error loading flashcards:", error);
       }
     };
     fetchFlashcards();
   }, [isAuthenticated]);
 
   const handleLogin = () => {
-    if (password === "bestdoctorprep") {
-      setIsAuthenticated(true);
-    } else {
-      alert("Incorrect password");
-    }
+    if (password === "bestdoctorprep") setIsAuthenticated(true);
+    else alert("Incorrect password");
   };
 
   const handleChange = (e: any) => {
@@ -47,40 +50,51 @@ export default function AdminPage() {
       alert("Please fill in both question and answer.");
       return;
     }
+
     try {
       if (editId) {
         const cardRef = doc(db, "flashcards", editId);
         await updateDoc(cardRef, { question, answer, topic });
         setFlashcards((prev) =>
-          prev.map((card) => (card.id === editId ? { ...card, question, answer, topic } : card))
+          prev.map((card) =>
+            card.docId === editId ? { ...card, question, answer, topic } : card
+          )
         );
         setEditId(null);
       } else {
-        const newCard = { question, answer, topic };
-        const docRef = await addDoc(collection(db, "flashcards"), newCard);
-        setFlashcards([{ id: docRef.id, ...newCard }, ...flashcards]);
+        const docRef = await addDoc(collection(db, "flashcards"), {
+          question,
+          answer,
+          topic,
+        });
+        setFlashcards([{ docId: docRef.id, question, answer, topic }, ...flashcards]);
       }
+
       setFormData({ question: "", answer: "", topic: "" });
-    } catch (err: any) {
-  console.error("Failed to save flashcard:", err);
-  alert("Failed to save flashcard: " + err.message);
-}
+    } catch (error) {
+      console.error("Error saving flashcard:", error);
+      alert("Failed to save flashcard.");
+    }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (docId: string) => {
     if (!confirm("Are you sure you want to delete this flashcard?")) return;
     try {
-      await deleteDoc(doc(db, "flashcards", id));
-      setFlashcards(flashcards.filter((card) => card.id !== id));
+      await deleteDoc(doc(db, "flashcards", docId));
+      setFlashcards(flashcards.filter((card) => card.docId !== docId));
     } catch (err) {
-      console.error("Error deleting:", err);
+      console.error("Error deleting flashcard:", err);
       alert("Delete failed.");
     }
   };
 
   const handleEdit = (card: any) => {
-    setFormData({ question: card.question, answer: card.answer, topic: card.topic });
-    setEditId(card.id);
+    setFormData({
+      question: card.question,
+      answer: card.answer,
+      topic: card.topic || "",
+    });
+    setEditId(card.docId);
   };
 
   if (!isAuthenticated) {
@@ -94,10 +108,7 @@ export default function AdminPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button
-          onClick={handleLogin}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
+        <button onClick={handleLogin} className="bg-blue-600 text-white px-4 py-2 rounded">
           Login
         </button>
       </main>
@@ -141,14 +152,15 @@ export default function AdminPage() {
           {editId ? "✏️ Update Flashcard" : "➕ Add Flashcard"}
         </button>
       </div>
+
       <h2 className="text-xl font-semibold mb-2">📋 Flashcards Preview</h2>
       {flashcards.length === 0 ? (
         <p>No flashcards yet.</p>
       ) : (
         <ul className="space-y-2">
           {flashcards.map((card) => (
-            <li key={card.id} className="border p-3 rounded shadow-sm bg-white">
-              <div className="text-sm text-gray-500">ID: {card.id}</div>
+            <li key={card.docId} className="border p-3 rounded shadow-sm bg-white">
+              <div className="text-sm text-gray-500">ID: {card.docId}</div>
               <div className="font-semibold">Q: {card.question}</div>
               <div>A: {card.answer}</div>
               <div className="text-sm italic text-gray-600">Topic: {card.topic}</div>
@@ -160,7 +172,7 @@ export default function AdminPage() {
                   ✏️ Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(card.id)}
+                  onClick={() => handleDelete(card.docId)}
                   className="text-sm text-red-600 underline"
                 >
                   🗑️ Delete
