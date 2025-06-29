@@ -61,10 +61,10 @@ export default function AdminPage() {
         setFlashcards([{ id: docRef.id, ...newCard }, ...flashcards]);
       }
       setFormData({ question: "", answer: "", topic: "" });
-    } catch (err) {
-      console.error("Failed to save flashcard:", err);
-      alert("Failed to save flashcard.");
-    }
+    } catch (err: any) {
+  console.error("Failed to save flashcard:", err);
+  alert("Failed to save flashcard: " + err.message);
+}
   };
 
   const handleDelete = async (id: string) => {
