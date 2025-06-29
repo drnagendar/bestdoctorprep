@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
@@ -48,6 +49,7 @@ export default function AdminPage() {
 
     try {
       if (editId) {
+        // UPDATE
         const cardRef = doc(db, "flashcards", editId);
         await updateDoc(cardRef, { question, answer, topic });
         setFlashcards((prev) =>
@@ -57,15 +59,15 @@ export default function AdminPage() {
         );
         setEditId(null);
       } else {
+        // ADD
         const newCard = { question, answer, topic };
         const docRef = await addDoc(collection(db, "flashcards"), newCard);
         setFlashcards([{ id: docRef.id, ...newCard }, ...flashcards]);
       }
-
       setFormData({ question: "", answer: "", topic: "" });
-    } catch (err) {
-      console.error("Error saving flashcard:", err);
-      alert("Failed to save flashcard.");
+    } catch (err: any) {
+      console.error("Error saving flashcard:", err.message || err);
+      alert(`Failed to save flashcard: ${err.message || err}`);
     }
   };
 
@@ -74,9 +76,9 @@ export default function AdminPage() {
     try {
       await deleteDoc(doc(db, "flashcards", id));
       setFlashcards(flashcards.filter((card) => card.id !== id));
-    } catch (err) {
-      console.error("Error deleting:", err);
-      alert("Delete failed.");
+    } catch (err: any) {
+      console.error("Error deleting:", err.message || err);
+      alert(`Delete failed: ${err.message || err}`);
     }
   };
 
@@ -143,12 +145,13 @@ export default function AdminPage() {
           {editId ? "✏️ Update Flashcard" : "➕ Add Flashcard"}
         </button>
       </div>
+
       <h2 className="text-xl font-semibold mb-2">📋 Flashcards Preview</h2>
       {flashcards.length === 0 ? (
         <p>No flashcards yet.</p>
       ) : (
         <ul className="space-y-2">
-          {flashcards.map((card) => (
+          {flashcards.map((card, index) => (
             <li key={card.id} className="border p-3 rounded shadow-sm bg-white">
               <div className="text-sm text-gray-500">ID: {card.id}</div>
               <div className="font-semibold">Q: {card.question}</div>
