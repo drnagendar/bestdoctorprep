@@ -1,14 +1,17 @@
-// File: context/AuthContext.tsx
+// File: app/context/AuthContext.tsx
 "use client";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { auth } from "@/firebaseConfig";
-interface AuthContextProps {
+import { auth } from "../firebaseConfig"; // ✅ Fixed relative import
+interface AuthContextType {
 user: User | null;
 loading: boolean;
 }
-const AuthContext = createContext({ user: null, loading: true });
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+const AuthContext = createContext({
+user: null,
+loading: true,
+});
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
 const [user, setUser] = useState<User | null>(null);
 const [loading, setLoading] = useState(true);
 useEffect(() => {
