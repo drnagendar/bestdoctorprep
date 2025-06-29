@@ -1,9 +1,14 @@
-// File: app/admin/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 export default function AdminPage() {
@@ -16,27 +21,25 @@ export default function AdminPage() {
     topic: "",
   });
 
-  // Fetch flashcards on login
+  // ✅ Fetch flashcards
   useEffect(() => {
     const fetchFlashcards = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "flashcards"));
-        const fetchedCards: any[] = [];
+        const cards: any[] = [];
         querySnapshot.forEach((docSnap) => {
-          fetchedCards.push({ id: docSnap.id, ...docSnap.data() });
+          cards.push({ id: docSnap.id, ...docSnap.data() });
         });
-        setFlashcards(fetchedCards.reverse()); // Show latest first
-      } catch (error) {
-        console.error("Error fetching flashcards: ", error);
+        setFlashcards(cards.reverse());
+      } catch (err) {
+        console.error("Fetch error", err);
       }
     };
 
-    if (isAuthenticated) {
-      fetchFlashcards();
-    }
+    if (isAuthenticated) fetchFlashcards();
   }, [isAuthenticated]);
 
-  // Login
+  // ✅ Login
   const handleLogin = () => {
     if (password === "bestdoctorprep") {
       setIsAuthenticated(true);
@@ -45,35 +48,35 @@ export default function AdminPage() {
     }
   };
 
-  // Form input handler
+  // ✅ Input change handler
   const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Add flashcard to Firestore
+  // ✅ Add flashcard
   const handleAddFlashcard = async () => {
     if (!formData.question || !formData.answer) {
       alert("Please fill out both question and answer");
       return;
     }
 
-    const flashcardData = {
+    const newCardData = {
       shortId: uuidv4().slice(0, 8),
       ...formData,
       createdAt: new Date().toISOString(),
     };
 
     try {
-      const docRef = await addDoc(collection(db, "flashcards"), flashcardData);
-      setFlashcards([{ id: docRef.id, ...flashcardData }, ...flashcards]);
+      const docRef = await addDoc(collection(db, "flashcards"), newCardData);
+      setFlashcards([{ id: docRef.id, ...newCardData }, ...flashcards]);
       setFormData({ question: "", answer: "", topic: "" });
     } catch (err) {
-      console.error("Error adding document: ", err);
-      alert("Failed to save flashcard. Try again.");
+      console.error("Add error", err);
+      alert("Failed to save flashcard");
     }
   };
 
-  // Delete flashcard from Firestore
+  // ✅ Delete flashcard
   const handleDelete = async (docId: string) => {
     const confirmDelete = confirm("Are you sure you want to delete this flashcard?");
     if (!confirmDelete) return;
@@ -81,14 +84,12 @@ export default function AdminPage() {
     try {
       await deleteDoc(doc(db, "flashcards", docId));
       setFlashcards((prev) => prev.filter((card) => card.id !== docId));
-      alert("Flashcard deleted.");
-    } catch (error) {
-      console.error("Error deleting flashcard:", error);
-      alert("Failed to delete flashcard. Try again.");
+    } catch (err) {
+      console.error("Delete error", err);
+      alert("Failed to delete flashcard");
     }
   };
 
-  // Admin login screen
   if (!isAuthenticated) {
     return (
       <main className="p-6 max-w-md mx-auto text-center">
@@ -110,7 +111,6 @@ export default function AdminPage() {
     );
   }
 
-  // Admin dashboard UI
   return (
     <main className="p-6 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">🧠 Add New Flashcard</h1>
