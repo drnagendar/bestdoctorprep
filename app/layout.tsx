@@ -1,10 +1,12 @@
-// File: app/layout.tsx
 import "./globals.css";
-import { AuthProvider } from "./context/AuthContext"; // ✅ Ensure the path is correct
+import { Inter } from "next/font/google";
+import Header from "../components/Header";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "BestDoctorPrep",
-  description: "Flashcards for medical students",
+  description: "Revise faster, retain longer with AI-powered medical flashcards",
 };
 
 export default function RootLayout({
@@ -14,8 +16,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <AuthProvider>{children}</AuthProvider>
+      <body className={inter.className}>
+        <Header />
+        <main className="max-w-5xl mx-auto px-4 mt-6">{children}</main>
       </body>
     </html>
   );
