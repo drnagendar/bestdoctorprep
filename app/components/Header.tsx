@@ -1,17 +1,18 @@
-"use client";
-
-import Link from "next/link";
+import { auth } from "../firebaseConfig";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { onAuthStateChanged, signOut, User } from "firebase/auth";
-import { auth } from "../../firebaseConfig"; // ✅ Corrected path
+import { Link } from "react-router-dom"; // Only if you're using react-router
 
 export default function Header() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      setLoading(false);
     });
+
     return () => unsubscribe();
   }, []);
 
@@ -20,34 +21,39 @@ export default function Header() {
       await signOut(auth);
     } catch (error) {
       console.error("Logout failed:", error);
-      alert("Logout failed");
     }
   };
 
   return (
-    <header className="flex items-center justify-between p-4 bg-gray-800 text-white">
-      <Link href="/" className="text-xl font-bold">
-        BestDoctorPrep
-      </Link>
-      <nav className="space-x-4">
-        {user ? (
-          <>
-            <span>{user.email}</span>
-            <button onClick={handleLogout} className="underline text-sm">
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link href="/(auth)/login" className="underline text-sm">
+    <header className="flex justify-between items-center p-4 bg-blue-600 text-white shadow-md">
+      <h1 className="text-xl font-bold">
+        <Link to="/">MedFlashcards</Link>
+      </h1>
+
+      {!loading && (
+        <div className="flex items-center gap-4">
+          {user ? (
+            <>
+              <span className="text-sm hidden sm:block">
+                Welcome, {user.email}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
+            >
               Login
             </Link>
-            <Link href="/(auth)/signup" className="underline text-sm">
-              Signup
-            </Link>
-          </>
-        )}
-      </nav>
+          )}
+        </div>
+      )}
     </header>
   );
 }
