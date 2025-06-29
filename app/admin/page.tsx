@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { v4 as uuidv4 } from "uuid";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 export default function AdminPage() {
@@ -13,6 +21,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!isAuthenticated) return;
+
     const fetchFlashcards = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "flashcards"));
@@ -20,11 +29,12 @@ export default function AdminPage() {
         querySnapshot.forEach((docSnap) => {
           cards.push({ id: docSnap.id, ...docSnap.data() });
         });
-        setFlashcards(cards.reverse());
+        setFlashcards(cards.reverse()); // newest on top
       } catch (err) {
         console.error("Error loading flashcards:", err);
       }
     };
+
     fetchFlashcards();
   }, [isAuthenticated]);
 
@@ -59,7 +69,7 @@ export default function AdminPage() {
         );
         setEditId(null);
       } else {
-        // ADD
+        // ADD NEW
         const newCard = { question, answer, topic };
         const docRef = await addDoc(collection(db, "flashcards"), newCard);
         setFlashcards([{ id: docRef.id, ...newCard }, ...flashcards]);
@@ -73,17 +83,22 @@ export default function AdminPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this flashcard?")) return;
+
     try {
       await deleteDoc(doc(db, "flashcards", id));
-      setFlashcards(flashcards.filter((card) => card.id !== id));
-    } catch (err: any) {
-      console.error("Error deleting:", err.message || err);
-      alert(`Delete failed: ${err.message || err}`);
+      setFlashcards((prev) => prev.filter((card) => card.id !== id));
+    } catch (err) {
+      console.error("Error deleting flashcard:", err);
+      alert("Delete failed.");
     }
   };
 
   const handleEdit = (card: any) => {
-    setFormData({ question: card.question, answer: card.answer, topic: card.topic });
+    setFormData({
+      question: card.question,
+      answer: card.answer,
+      topic: card.topic || "",
+    });
     setEditId(card.id);
   };
 
@@ -145,13 +160,12 @@ export default function AdminPage() {
           {editId ? "✏️ Update Flashcard" : "➕ Add Flashcard"}
         </button>
       </div>
-
       <h2 className="text-xl font-semibold mb-2">📋 Flashcards Preview</h2>
       {flashcards.length === 0 ? (
         <p>No flashcards yet.</p>
       ) : (
         <ul className="space-y-2">
-          {flashcards.map((card, index) => (
+          {flashcards.map((card) => (
             <li key={card.id} className="border p-3 rounded shadow-sm bg-white">
               <div className="text-sm text-gray-500">ID: {card.id}</div>
               <div className="font-semibold">Q: {card.question}</div>
