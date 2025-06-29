@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { auth } from "../../../firebaseConfig";
+import { auth } from "../../firebaseConfig";
 
 export default function LoginPage() {
   const router = useRouter();
