@@ -24,6 +24,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!isAuthenticated) return;
+
     const fetchFlashcards = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "flashcards"));
@@ -36,6 +37,7 @@ export default function AdminPage() {
         console.error("Error loading flashcards:", err);
       }
     };
+
     fetchFlashcards();
   }, [isAuthenticated]);
 
@@ -60,6 +62,7 @@ export default function AdminPage() {
 
     try {
       if (editId) {
+        // UPDATE EXISTING
         const cardRef = doc(db, "flashcards", editId);
         await updateDoc(cardRef, { question, answer, topic });
         setFlashcards((prev) =>
@@ -67,19 +70,17 @@ export default function AdminPage() {
             card.id === editId ? { ...card, question, answer, topic } : card
           )
         );
-        alert("✅ Flashcard updated successfully");
         setEditId(null);
       } else {
+        // ADD NEW
         const newCard = { question, answer, topic };
         const docRef = await addDoc(collection(db, "flashcards"), newCard);
         setFlashcards([{ id: docRef.id, ...newCard }, ...flashcards]);
-        alert("✅ Flashcard added successfully");
       }
-
       setFormData({ question: "", answer: "", topic: "" });
-    } catch (err) {
-      console.error("Error saving flashcard:", err);
-      alert("Failed to save flashcard.");
+    } catch (err: any) {
+      console.error("Error saving flashcard:", err?.code, err?.message, err);
+      alert("Failed to save flashcard: " + (err?.message || "Unknown error"));
     }
   };
 
@@ -87,20 +88,15 @@ export default function AdminPage() {
     if (!confirm("Are you sure you want to delete this flashcard?")) return;
     try {
       await deleteDoc(doc(db, "flashcards", id));
-      setFlashcards((prev) => prev.filter((card) => card.id !== id));
-      alert("🗑️ Flashcard deleted");
-    } catch (err) {
-      console.error("Error deleting:", err);
-      alert("Delete failed.");
+      setFlashcards(flashcards.filter((card) => card.id !== id));
+    } catch (err: any) {
+      console.error("Error deleting:", err?.code, err?.message, err);
+      alert("Delete failed: " + (err?.message || "Unknown error"));
     }
   };
 
   const handleEdit = (card: any) => {
-    setFormData({
-      question: card.question,
-      answer: card.answer,
-      topic: card.topic,
-    });
+    setFormData({ question: card.question, answer: card.answer, topic: card.topic });
     setEditId(card.id);
   };
 
@@ -162,22 +158,17 @@ export default function AdminPage() {
           {editId ? "✏️ Update Flashcard" : "➕ Add Flashcard"}
         </button>
       </div>
-
       <h2 className="text-xl font-semibold mb-2">📋 Flashcards Preview</h2>
       {flashcards.length === 0 ? (
         <p>No flashcards yet.</p>
       ) : (
         <ul className="space-y-2">
-          {flashcards.map((card, index) => (
+          {flashcards.map((card) => (
             <li key={card.id} className="border p-3 rounded shadow-sm bg-white">
-              <div className="text-sm text-gray-500">
-                ID: {index + 1} — {card.id}
-              </div>
+              <div className="text-sm text-gray-500">ID: {card.id}</div>
               <div className="font-semibold">Q: {card.question}</div>
               <div>A: {card.answer}</div>
-              <div className="text-sm italic text-gray-600">
-                Topic: {card.topic}
-              </div>
+              <div className="text-sm italic text-gray-600">Topic: {card.topic}</div>
               <div className="mt-2 flex gap-3">
                 <button
                   onClick={() => handleEdit(card)}
