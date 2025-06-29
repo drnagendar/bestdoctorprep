@@ -1,30 +1,17 @@
 "use client";
 import { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [flashcards, setFlashcards] = useState<any[]>([]);
-  const [formData, setFormData] = useState({
-    question: "",
-    answer: "",
-    topic: "",
-  });
+  const [formData, setFormData] = useState({ question: "", answer: "", topic: "" });
   const [editId, setEditId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) return;
-
     const fetchFlashcards = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "flashcards"));
@@ -37,7 +24,6 @@ export default function AdminPage() {
         console.error("Error loading flashcards:", err);
       }
     };
-
     fetchFlashcards();
   }, [isAuthenticated]);
 
@@ -62,7 +48,6 @@ export default function AdminPage() {
 
     try {
       if (editId) {
-        // UPDATE EXISTING
         const cardRef = doc(db, "flashcards", editId);
         await updateDoc(cardRef, { question, answer, topic });
         setFlashcards((prev) =>
@@ -72,15 +57,15 @@ export default function AdminPage() {
         );
         setEditId(null);
       } else {
-        // ADD NEW
         const newCard = { question, answer, topic };
         const docRef = await addDoc(collection(db, "flashcards"), newCard);
         setFlashcards([{ id: docRef.id, ...newCard }, ...flashcards]);
       }
+
       setFormData({ question: "", answer: "", topic: "" });
-    } catch (err: any) {
-      console.error("Error saving flashcard:", err?.code, err?.message, err);
-      alert("Failed to save flashcard: " + (err?.message || "Unknown error"));
+    } catch (err) {
+      console.error("Error saving flashcard:", err);
+      alert("Failed to save flashcard.");
     }
   };
 
@@ -89,9 +74,9 @@ export default function AdminPage() {
     try {
       await deleteDoc(doc(db, "flashcards", id));
       setFlashcards(flashcards.filter((card) => card.id !== id));
-    } catch (err: any) {
-      console.error("Error deleting:", err?.code, err?.message, err);
-      alert("Delete failed: " + (err?.message || "Unknown error"));
+    } catch (err) {
+      console.error("Error deleting:", err);
+      alert("Delete failed.");
     }
   };
 
