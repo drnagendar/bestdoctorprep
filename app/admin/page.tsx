@@ -16,14 +16,14 @@ export default function AdminPage() {
     topic: "",
   });
 
-  // Fetch flashcards from Firestore
+  // Fetch flashcards on login
   useEffect(() => {
     const fetchFlashcards = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "flashcards"));
         const fetchedCards: any[] = [];
-        querySnapshot.forEach((doc) => {
-          fetchedCards.push({ id: doc.id, ...doc.data() });
+        querySnapshot.forEach((docSnap) => {
+          fetchedCards.push({ id: docSnap.id, ...docSnap.data() });
         });
         setFlashcards(fetchedCards.reverse()); // Show latest first
       } catch (error) {
@@ -36,7 +36,7 @@ export default function AdminPage() {
     }
   }, [isAuthenticated]);
 
-  // Handle login
+  // Login
   const handleLogin = () => {
     if (password === "bestdoctorprep") {
       setIsAuthenticated(true);
@@ -45,27 +45,27 @@ export default function AdminPage() {
     }
   };
 
-  // Handle input change
+  // Form input handler
   const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Add flashcard
+  // Add flashcard to Firestore
   const handleAddFlashcard = async () => {
     if (!formData.question || !formData.answer) {
       alert("Please fill out both question and answer");
       return;
     }
 
-    const newCard = {
-      id: uuidv4().slice(0, 8),
+    const flashcardData = {
+      shortId: uuidv4().slice(0, 8),
       ...formData,
       createdAt: new Date().toISOString(),
     };
 
     try {
-      await addDoc(collection(db, "flashcards"), newCard);
-      setFlashcards([newCard, ...flashcards]);
+      const docRef = await addDoc(collection(db, "flashcards"), flashcardData);
+      setFlashcards([{ id: docRef.id, ...flashcardData }, ...flashcards]);
       setFormData({ question: "", answer: "", topic: "" });
     } catch (err) {
       console.error("Error adding document: ", err);
@@ -73,22 +73,22 @@ export default function AdminPage() {
     }
   };
 
-  // Delete flashcard
-  const handleDelete = async (id: string) => {
+  // Delete flashcard from Firestore
+  const handleDelete = async (docId: string) => {
     const confirmDelete = confirm("Are you sure you want to delete this flashcard?");
     if (!confirmDelete) return;
 
     try {
-      await deleteDoc(doc(db, "flashcards", id));
-      setFlashcards((prev) => prev.filter((card) => card.id !== id));
-      alert("Flashcard deleted successfully.");
+      await deleteDoc(doc(db, "flashcards", docId));
+      setFlashcards((prev) => prev.filter((card) => card.id !== docId));
+      alert("Flashcard deleted.");
     } catch (error) {
       console.error("Error deleting flashcard:", error);
       alert("Failed to delete flashcard. Try again.");
     }
   };
 
-  // Login screen
+  // Admin login screen
   if (!isAuthenticated) {
     return (
       <main className="p-6 max-w-md mx-auto text-center">
@@ -110,7 +110,7 @@ export default function AdminPage() {
     );
   }
 
-  // Admin dashboard
+  // Admin dashboard UI
   return (
     <main className="p-6 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">🧠 Add New Flashcard</h1>
@@ -153,8 +153,11 @@ export default function AdminPage() {
 
       <ul className="space-y-2">
         {flashcards.map((card) => (
-          <li key={card.id} className="border p-3 rounded shadow-sm bg-white">
-            <div className="text-sm text-gray-500">ID: {card.id}</div>
+          <li
+            key={card.id}
+            className="border p-3 rounded shadow-sm bg-white"
+          >
+            <div className="text-sm text-gray-500">ID: {card.shortId}</div>
             <div className="font-semibold">Q: {card.question}</div>
             <div>A: {card.answer}</div>
             <div className="text-sm italic text-gray-600">Topic: {card.topic}</div>
