@@ -1,44 +1,55 @@
-// File: app/(auth)/login/page.tsx
 "use client";
 
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { auth } from "@/firebaseConfig";
+import { auth } from "../../../firebaseConfig";
 
 export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleLogin = async () => {
+    setError("");
     try {
       await signInWithEmailAndPassword(auth, form.email, form.password);
-      router.push("/"); // Redirect after login
-    } catch (err) {
-      alert("Login failed. Check email and password.");
-      console.error("Login error:", err);
+      router.push("/"); // redirect to homepage or dashboard
+    } catch (err: any) {
+      console.error("Login failed:", err.message);
+      setError(err.message || "Login failed");
     }
   };
 
   return (
     <main className="max-w-md mx-auto p-6">
-      <h1 className="text-xl font-bold mb-4">🔐 Login</h1>
+      <h2 className="text-2xl font-bold mb-4">Login</h2>
       <input
         type="email"
+        name="email"
         placeholder="Email"
         value={form.email}
-        onChange={(e) => setForm({ ...form, email: e.target.value })}
-        className="border px-3 py-2 rounded w-full mb-3"
+        onChange={handleChange}
+        className="border rounded w-full px-3 py-2 mb-3"
       />
       <input
         type="password"
+        name="password"
         placeholder="Password"
         value={form.password}
-        onChange={(e) => setForm({ ...form, password: e.target.value })}
-        className="border px-3 py-2 rounded w-full mb-4"
+        onChange={handleChange}
+        className="border rounded w-full px-3 py-2 mb-3"
       />
-      <button onClick={handleLogin} className="bg-blue-600 text-white px-4 py-2 rounded">
-        🔓 Login
+      {error && <p className="text-red-600 text-sm mb-2">{error}</p>}
+      <button
+        onClick={handleLogin}
+        className="bg-blue-600 text-white px-4 py-2 rounded w-full"
+      >
+        Login
       </button>
     </main>
   );
