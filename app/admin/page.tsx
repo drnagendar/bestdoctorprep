@@ -1,15 +1,11 @@
+// File: app/admin/page.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
 import { db } from "../firebaseConfig";
+import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -25,17 +21,22 @@ export default function AdminPage() {
     const fetchFlashcards = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "flashcards"));
-        const cards: any[] = [];
+        const fetchedCards: any[] = [];
         querySnapshot.forEach((docSnap) => {
-          cards.push({ firestoreId: docSnap.id, ...docSnap.data() });
+          fetchedCards.push({
+            firestoreId: docSnap.id,
+            ...docSnap.data(),
+          });
         });
-        setFlashcards(cards.reverse());
-      } catch (err) {
-        console.error("Error fetching flashcards:", err);
+        setFlashcards(fetchedCards.reverse());
+      } catch (error) {
+        console.error("Error fetching flashcards: ", error);
       }
     };
 
-    if (isAuthenticated) fetchFlashcards();
+    if (isAuthenticated) {
+      fetchFlashcards();
+    }
   }, [isAuthenticated]);
 
   const handleLogin = () => {
@@ -65,11 +66,14 @@ export default function AdminPage() {
 
     try {
       const docRef = await addDoc(collection(db, "flashcards"), newCard);
-      setFlashcards([{ firestoreId: docRef.id, ...newCard }, ...flashcards]);
+      setFlashcards([
+        { firestoreId: docRef.id, ...newCard },
+        ...flashcards,
+      ]);
       setFormData({ question: "", answer: "", topic: "" });
     } catch (err) {
-      console.error("Error adding flashcard:", err);
-      alert("Failed to save flashcard");
+      console.error("Error adding document: ", err);
+      alert("Failed to save flashcard. Try again.");
     }
   };
 
@@ -80,9 +84,9 @@ export default function AdminPage() {
     try {
       await deleteDoc(doc(db, "flashcards", firestoreId));
       setFlashcards((prev) => prev.filter((card) => card.firestoreId !== firestoreId));
-    } catch (err) {
-      console.error("Error deleting flashcard:", err);
-      alert("Failed to delete flashcard");
+    } catch (error) {
+      console.error("Error deleting flashcard:", error);
+      alert("Failed to delete flashcard. Try again.");
     }
   };
 
@@ -110,7 +114,6 @@ export default function AdminPage() {
   return (
     <main className="p-6 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">🧠 Add New Flashcard</h1>
-
       <div className="space-y-3 mb-6">
         <input
           type="text"
@@ -146,14 +149,12 @@ export default function AdminPage() {
 
       <h2 className="text-xl font-semibold mb-2">📋 Flashcards Preview</h2>
       {flashcards.length === 0 && <p>No flashcards yet.</p>}
-
       <ul className="space-y-2">
         {flashcards.map((card) => (
-          <li
-            key={card.firestoreId}
-            className="border p-3 rounded shadow-sm bg-white"
-          >
-            <div className="text-sm text-gray-500">ID: {card.shortId}</div>
+          <li key={card.firestoreId} className="border p-3 rounded shadow-sm bg-white">
+            <div className="text-sm text-gray-500">
+              ID: {card.shortId || card.firestoreId.slice(0, 8)}
+            </div>
             <div className="font-semibold">Q: {card.question}</div>
             <div>A: {card.answer}</div>
             <div className="text-sm italic text-gray-600">Topic: {card.topic}</div>
