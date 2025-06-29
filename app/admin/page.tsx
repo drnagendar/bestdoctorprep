@@ -21,7 +21,7 @@ export default function AdminPage() {
     topic: "",
   });
 
-  // ✅ Fetch flashcards
+  // ✅ Fetch flashcards from Firestore
   useEffect(() => {
     const fetchFlashcards = async () => {
       try {
@@ -48,7 +48,7 @@ export default function AdminPage() {
     }
   };
 
-  // ✅ Input change handler
+  // ✅ Input handler
   const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -60,15 +60,16 @@ export default function AdminPage() {
       return;
     }
 
-    const newCardData = {
-      shortId: uuidv4().slice(0, 8),
+    const shortId = uuidv4().slice(0, 8);
+    const newCard = {
+      shortId,
       ...formData,
       createdAt: new Date().toISOString(),
     };
 
     try {
-      const docRef = await addDoc(collection(db, "flashcards"), newCardData);
-      setFlashcards([{ id: docRef.id, ...newCardData }, ...flashcards]);
+      const docRef = await addDoc(collection(db, "flashcards"), newCard);
+      setFlashcards([{ id: docRef.id, ...newCard }, ...flashcards]);
       setFormData({ question: "", answer: "", topic: "" });
     } catch (err) {
       console.error("Add error", err);
