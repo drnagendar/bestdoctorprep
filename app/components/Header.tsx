@@ -24,11 +24,10 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full flex items-center justify-between p-4 bg-blue-600 text-white shadow-md">
-      <h1 className="text-xl font-bold">
-        <Link href="/">MedFlashcards</Link>
+    <header className="w-full flex flex-col sm:flex-row items-center justify-between p-4 bg-blue-600 text-white shadow-md">
+      <h1 className="text-2xl font-bold mb-2 sm:mb-0">
+        <Link href="/">BestDoctorPrep</Link>
       </h1>
-
       <nav className="flex items-center gap-4">
         {user ? (
           <>
