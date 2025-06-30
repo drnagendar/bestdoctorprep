@@ -1,6 +1,6 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
-import Header from "./components/Header"; // ✅ Corrected relative path
+import Header from "./components/Header";
 import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,14 +19,21 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} flex flex-col min-h-screen`}>
         <Header />
-        <main className="flex-1 max-w-5xl mx-auto px-4 py-6">{children}</main>
+
+        {/* This expands to fill space between header and footer */}
+        <main className="flex-1 max-w-5xl mx-auto px-4 py-6">
+          {children}
+        </main>
+
         <footer className="text-center text-sm text-gray-500 py-4 border-t">
           <p className="mb-1">
             <Link href="/disclaimer" className="hover:underline">
               Disclaimer: Not affiliated with ICMR or NPTEL
             </Link>
           </p>
-          <p>© {new Date().getFullYear()} BestDoctorPrep.in — All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} BestDoctorPrep.in — All rights reserved.
+          </p>
         </footer>
       </body>
     </html>
