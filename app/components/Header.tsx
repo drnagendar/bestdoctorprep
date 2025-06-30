@@ -28,12 +28,24 @@ export default function Header() {
       <h1 className="text-2xl font-bold mb-2 sm:mb-0">
         <Link href="/">BestDoctorPrep</Link>
       </h1>
-      <nav className="flex items-center gap-4">
+
+      <nav className="flex items-center flex-wrap gap-4 justify-center sm:justify-end">
+        <Link href="/" className="hover:underline">
+          Home
+        </Link>
+        <Link href="/flashcards" className="hover:underline">
+          Flashcards
+        </Link>
+        <Link href="/about" className="hover:underline">
+          About
+        </Link>
+        <Link href="/contact" className="hover:underline">
+          Contact
+        </Link>
+
         {user ? (
           <>
-            <span className="text-sm hidden sm:block">
-              Welcome, {user.email}
-            </span>
+            <span className="text-sm hidden sm:block">Welcome, {user.email}</span>
             <button
               onClick={handleLogout}
               className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
