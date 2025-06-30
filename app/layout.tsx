@@ -17,17 +17,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <div className="flex flex-col min-h-screen">
-          {/* Header */}
+      <body>
+        <div className={`flex flex-col min-h-screen ${inter.className}`}>
           <Header />
-
-          {/* Main content */}
           <main className="flex-1 max-w-5xl mx-auto px-4 py-6 w-full">
             {children}
           </main>
-
-          {/* Sticky global footer */}
           <footer className="text-center text-sm text-gray-500 py-4 border-t w-full">
             <p className="mb-1">
               <Link href="/disclaimer" className="hover:underline">
