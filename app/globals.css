@@ -1,17 +1,16 @@
 @import "tailwindcss";
 
+/* Light mode defaults */
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: monospace;
 }
 
+/* Dark mode override */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -19,12 +18,22 @@
   }
 }
 
+/* Apply global styles */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Ensure headings, paragraphs, links use foreground color */
+h1, h2, h3, h4, h5, h6,
+p, span, a, li, blockquote {
+  color: var(--foreground);
+}
+
+/* Utility classes for 3D transforms */
 .perspective {
   perspective: 1000px;
 }
