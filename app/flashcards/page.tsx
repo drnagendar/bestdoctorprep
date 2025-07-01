@@ -17,7 +17,7 @@ export default function FlashcardsPage() {
   const [topics, setTopics] = useState<string[]>([]);
   const [selectedTopic, setSelectedTopic] = useState("all");
   const [index, setIndex] = useState(0);
-  const [flipped, setFlipped] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false);
 
   useEffect(() => {
     const loadCards = async () => {
@@ -47,7 +47,7 @@ export default function FlashcardsPage() {
         : cards.filter((c) => c.topic === selectedTopic);
     setFiltered(results);
     setIndex(0);
-    setFlipped(false);
+    setShowAnswer(false);
   }, [selectedTopic, cards]);
 
   const current = filtered[index];
@@ -76,46 +76,36 @@ export default function FlashcardsPage() {
             </select>
           </div>
 
-          {/* Flip Card */}
-          <div className="relative w-full h-64 mb-4 perspective">
-            <div
-              className={`transition-transform duration-500 w-full h-full transform-style preserve-3d ${
-                flipped ? "rotate-y-180" : ""
-              }`}
-            >
-              {/* Front Side */}
-              <div className="absolute w-full h-full backface-hidden bg-white border rounded shadow p-6 flex flex-col justify-center items-center relative">
-                <p className="absolute top-2 right-3 text-[10px] text-gray-400">
-                  ID: {current.docId}
-                </p>
-                <p className="text-xs text-blue-600 uppercase tracking-wide mb-2">
-                  {current.topic || "Untitled"}
-                </p>
-                <h2 className="text-lg font-semibold">{current.question}</h2>
-              </div>
+          {/* Static Card */}
+          <div className="border rounded shadow p-6 bg-white relative min-h-[150px]">
+            <p className="absolute top-2 right-3 text-[10px] text-gray-400">
+              ID: {current.docId}
+            </p>
+            <p className="text-xs text-blue-600 uppercase tracking-wide mb-2">
+              {current.topic || "Untitled"}
+            </p>
+            <h2 className="text-lg font-semibold mb-4">{current.question}</h2>
 
-              {/* Back Side */}
-              <div className="absolute w-full h-full backface-hidden bg-green-100 border rounded shadow p-6 transform rotate-y-180 flex items-center justify-center">
-                <p className="text-green-800 font-medium">{current.answer}</p>
+            {showAnswer && (
+              <div className="text-green-800 font-medium border-t pt-4 mt-4">
+                {current.answer}
               </div>
-            </div>
+            )}
           </div>
 
-          {!flipped && (
-            <button
-              onClick={() => setFlipped(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded"
-            >
-              Show Answer
-            </button>
-          )}
+          <button
+            onClick={() => setShowAnswer((prev) => !prev)}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            {showAnswer ? "Hide Answer" : "Show Answer"}
+          </button>
 
           <div className="mt-4 flex justify-between items-center">
             <button
               className="text-sm text-gray-600 underline disabled:text-gray-300"
               onClick={() => {
                 setIndex((prev) => Math.max(0, prev - 1));
-                setFlipped(false);
+                setShowAnswer(false);
               }}
               disabled={index === 0}
             >
@@ -130,7 +120,7 @@ export default function FlashcardsPage() {
               className="text-sm text-gray-600 underline disabled:text-gray-300"
               onClick={() => {
                 setIndex((prev) => Math.min(filtered.length - 1, prev + 1));
-                setFlipped(false);
+                setShowAnswer(false);
               }}
               disabled={index === filtered.length - 1}
             >
