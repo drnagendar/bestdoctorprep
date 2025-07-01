@@ -75,7 +75,7 @@ export default function FlashcardsPage() {
             </select>
           </div>
 
-          {/* Flip Card Container */}
+          {/* Flip Card */}
           <div className="relative w-full h-64 mb-4 perspective">
             <div
               className={`transition-transform duration-500 w-full h-full transform-style preserve-3d ${
@@ -86,6 +86,9 @@ export default function FlashcardsPage() {
               <div className="absolute w-full h-full backface-hidden bg-white border rounded shadow p-6 flex flex-col justify-center items-center">
                 <p className="text-xs text-blue-600 uppercase tracking-wide mb-2">
                   {current.topic || "Untitled"}
+                </p>
+                <p className="text-[10px] text-gray-400 mb-1">
+                  ID: {current.docId}
                 </p>
                 <h2 className="text-lg font-semibold">{current.question}</h2>
               </div>
@@ -115,26 +118,3 @@ export default function FlashcardsPage() {
               }}
               disabled={index === 0}
             >
-              ⬅️ Previous
-            </button>
-
-            <p className="text-sm">
-              Card {index + 1} of {filtered.length}
-            </p>
-
-            <button
-              className="text-sm text-gray-600 underline disabled:text-gray-300"
-              onClick={() => {
-                setIndex((prev) => Math.min(filtered.length - 1, prev + 1));
-                setFlipped(false);
-              }}
-              disabled={index === filtered.length - 1}
-            >
-              Next ➡️
-            </button>
-          </div>
-        </>
-      )}
-    </main>
-  );
-}
