@@ -6,6 +6,7 @@ import {
   SITE_NAME,
   COPYRIGHT_YEAR,
   DISCLAIMER_LINK,
+  PRIVACY_LINK,
 } from "./lib/constants";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -34,9 +35,12 @@ export default function RootLayout({
 
           {/* Sticky Global Footer */}
           <footer className="text-center text-sm text-gray-500 py-4 border-t w-full">
-            <p className="mb-1">
+            <p className="mb-1 space-x-4">
               <Link href={DISCLAIMER_LINK} className="hover:underline">
-                Disclaimer: Educational content. AI-assisted. Not affiliated with official bodies.
+                Disclaimer
+              </Link>
+              <Link href={PRIVACY_LINK} className="hover:underline">
+                Privacy
               </Link>
             </p>
             <p>
