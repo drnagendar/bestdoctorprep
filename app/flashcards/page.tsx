@@ -34,7 +34,7 @@ export default function FlashcardsPage() {
       const foundTopics = Array.from(
         new Set(sorted.map((c) => c.topic?.trim()).filter(Boolean))
       );
-      setTopics(foundTopics);
+      setTopics(foundTopics as string[]);
     };
     loadCards();
   }, []);
