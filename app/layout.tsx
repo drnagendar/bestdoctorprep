@@ -7,6 +7,7 @@ import {
   COPYRIGHT_YEAR,
   DISCLAIMER_LINK,
   PRIVACY_LINK,
+  TERMS_LINK,
 } from "./lib/constants";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -41,6 +42,9 @@ export default function RootLayout({
               </Link>
               <Link href={PRIVACY_LINK} className="hover:underline">
                 Privacy
+              </Link>
+              <Link href={TERMS_LINK} className="hover:underline">
+                Terms
               </Link>
             </p>
             <p>

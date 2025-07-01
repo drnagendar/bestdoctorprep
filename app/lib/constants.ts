@@ -12,3 +12,6 @@ export const DISCLAIMER_LINK = "/disclaimer";
 
 export const PRIVACY_LINK = "/privacy";
 
+export const TERMS_LINK = "/terms";
+
+
