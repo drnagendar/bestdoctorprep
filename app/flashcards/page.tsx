@@ -15,7 +15,7 @@ export default function FlashcardsPage() {
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [filtered, setFiltered] = useState<Flashcard[]>([]);
   const [topics, setTopics] = useState<string[]>([]);
-  const [selectedTopic, setSelectedTopic] = useState<string>("all");
+  const [selectedTopic, setSelectedTopic] = useState("all");
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
 
@@ -36,6 +36,7 @@ export default function FlashcardsPage() {
       );
       setTopics(foundTopics as string[]);
     };
+
     loadCards();
   }, []);
 
@@ -118,3 +119,26 @@ export default function FlashcardsPage() {
               }}
               disabled={index === 0}
             >
+              ⬅️ Previous
+            </button>
+
+            <p className="text-sm">
+              Card {index + 1} of {filtered.length}
+            </p>
+
+            <button
+              className="text-sm text-gray-600 underline disabled:text-gray-300"
+              onClick={() => {
+                setIndex((prev) => Math.min(filtered.length - 1, prev + 1));
+                setFlipped(false);
+              }}
+              disabled={index === filtered.length - 1}
+            >
+              Next ➡️
+            </button>
+          </div>
+        </>
+      )}
+    </main>
+  );
+}
