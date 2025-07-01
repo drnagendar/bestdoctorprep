@@ -51,14 +51,13 @@ export default function FlashcardsPage() {
   }, [selectedTopic, cards]);
 
   const current = filtered[index];
-  console.log("🔍 current flashcard:", current);
 
   return (
     <main className="p-6 max-w-2xl mx-auto text-center">
       <h1 className="text-2xl font-bold mb-4">🧠 Flashcard Session</h1>
 
-      {filtered.length === 0 ? (
-        <p>No flashcards found for this topic.</p>
+      {filtered.length === 0 || !current ? (
+        <p>Loading or no flashcards found.</p>
       ) : (
         <>
           <div className="mb-4">
@@ -84,22 +83,20 @@ export default function FlashcardsPage() {
                 flipped ? "rotate-y-180" : ""
               }`}
             >
-              {/* Front */}
+              {/* Front Side */}
               <div className="absolute w-full h-full backface-hidden bg-white border rounded shadow p-6 flex flex-col justify-center items-center relative">
                 <p className="absolute top-2 right-3 text-[10px] text-gray-400">
-                  ID: {current?.docId || "—"}
+                  ID: {current.docId}
                 </p>
                 <p className="text-xs text-blue-600 uppercase tracking-wide mb-2">
-                  {current?.topic || "Untitled"}
+                  {current.topic || "Untitled"}
                 </p>
-                <h2 className="text-lg font-semibold">{current?.question}</h2>
+                <h2 className="text-lg font-semibold">{current.question}</h2>
               </div>
 
-              {/* Back */}
+              {/* Back Side */}
               <div className="absolute w-full h-full backface-hidden bg-green-100 border rounded shadow p-6 transform rotate-y-180 flex items-center justify-center">
-                <p className="text-green-800 font-medium">
-                  {current?.answer}
-                </p>
+                <p className="text-green-800 font-medium">{current.answer}</p>
               </div>
             </div>
           </div>
