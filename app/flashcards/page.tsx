@@ -84,12 +84,12 @@ export default function FlashcardsPage() {
               }`}
             >
               {/* Front */}
-              <div className="absolute w-full h-full backface-hidden bg-white border rounded shadow p-6 flex flex-col justify-center items-center">
+              <div className="absolute w-full h-full backface-hidden bg-white border rounded shadow p-6 flex flex-col justify-center items-center relative">
+                <p className="absolute top-2 right-3 text-[10px] text-gray-400">
+                  ID: {current.docId}
+                </p>
                 <p className="text-xs text-blue-600 uppercase tracking-wide mb-2">
                   {current.topic || "Untitled"}
-                </p>
-                <p className="text-[10px] text-gray-400 mb-1">
-                  ID: {current.docId}
                 </p>
                 <h2 className="text-lg font-semibold">{current.question}</h2>
               </div>
