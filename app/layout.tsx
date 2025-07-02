@@ -24,22 +24,25 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <div className={`flex flex-col min-h-screen ${inter.className}`}>
+      <head />
+      <body className={inter.className}>
+        <div className="flex flex-col min-h-screen">
           {/* Header */}
-          <Header />
+          <header>
+            <Header />
+          </header>
 
-          {/* Main Content Area */}
+          {/* Main Content */}
           <main className="flex-1">
-            <div className="max-w-7xl w-full mx-auto px-6 py-6">
+            <div className="max-w-7xl mx-auto w-full px-6 py-6">
               {children}
             </div>
           </main>
 
           {/* Footer */}
-          <footer className="text-center text-sm text-gray-500 py-4 border-t w-full">
-            <div className="max-w-7xl mx-auto px-6">
-              <p className="mb-1 space-x-4">
+          <footer className="w-full border-t text-center text-sm text-gray-500 py-4">
+            <div className="max-w-7xl mx-auto px-6 space-y-2">
+              <p className="space-x-4">
                 <Link href={DISCLAIMER_LINK} className="hover:underline">
                   Disclaimer
                 </Link>
