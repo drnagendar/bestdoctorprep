@@ -4,7 +4,7 @@
 /* 🌞 Light Mode Defaults */
 :root {
   --background: #ffffff;
-  --foreground: #3b3b3b; /* Softened from pure black for body text */
+  --foreground: #3b3b3b; /* Softer text for better readability */
   --font-sans: 'Inter', sans-serif;
   --font-mono: monospace;
 }
@@ -16,13 +16,12 @@
     --foreground: #ededed;
   }
 
-  /* Optional: dim headings a bit in dark mode */
   h1, h2, h3, h4, h5, h6 {
     color: #ffffff;
   }
 }
 
-/* 🔧 Base Styles */
+/* 🔧 Base Layout */
 body {
   margin: 0;
   padding: 0;
@@ -31,12 +30,12 @@ body {
   line-height: 1.6;
 }
 
-/* 🎨 Apply foreground color to body text only */
+/* ✍️ Regular content text color */
 p, span, li, blockquote, a, strong, em, code {
   color: var(--foreground);
 }
 
-/* ✨ White headings for visibility on blue background */
+/* ✨ White Headings — for top strip and blue sections */
 h1, h2, h3, h4, h5, h6 {
   color: #ffffff;
   font-weight: 700;
@@ -44,7 +43,16 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.5rem;
 }
 
-/* 🎥 3D Utility Helpers */
+/* 🔷 Optional: Ensure navigation bar text is white */
+header, nav, .navbar, .topbar {
+  color: #ffffff;
+}
+
+header a, nav a {
+  color: #ffffff !important;
+}
+
+/* 🌀 3D Animation Utilities */
 .perspective {
   perspective: 1000px;
 }
