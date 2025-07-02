@@ -4,7 +4,7 @@
 /* 🌞 Light Mode Defaults */
 :root {
   --background: #ffffff;
-  --foreground: #3b3b3b; /* softened for readability */
+  --foreground: #3b3b3b; /* Softened from pure black for body text */
   --font-sans: 'Inter', sans-serif;
   --font-mono: monospace;
 }
@@ -16,12 +16,13 @@
     --foreground: #ededed;
   }
 
+  /* Optional: dim headings a bit in dark mode */
   h1, h2, h3, h4, h5, h6 {
-    color: #dddddd; /* Keep headings bright in dark mode */
+    color: #ffffff;
   }
 }
 
-/* 🧱 Base Element Styles */
+/* 🔧 Base Styles */
 body {
   margin: 0;
   padding: 0;
@@ -30,19 +31,20 @@ body {
   line-height: 1.6;
 }
 
-/* ✍️ Typography Color Targeting Only Regular Text */
+/* 🎨 Apply foreground color to body text only */
 p, span, li, blockquote, a, strong, em, code {
   color: var(--foreground);
 }
 
-/* ⬆️ Headings Remain Bold and Distinct */
+/* ✨ White headings for visibility on blue background */
 h1, h2, h3, h4, h5, h6 {
+  color: #ffffff;
   font-weight: 700;
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
 }
 
-/* 🌀 3D Utility Helpers */
+/* 🎥 3D Utility Helpers */
 .perspective {
   perspective: 1000px;
 }
