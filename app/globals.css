@@ -30,12 +30,12 @@ body {
   line-height: 1.6;
 }
 
-/* ✍️ Regular Text (body content only) */
+/* ✍️ Regular Text */
 p, span, li, blockquote, a, strong, em, code {
   color: var(--foreground);
 }
 
-/* 🔠 Headings */
+/* 🔠 Headings (always white for contrast in hero/header sections) */
 h1, h2, h3, h4, h5, h6 {
   color: #ffffff;
   font-weight: 700;
@@ -43,16 +43,22 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.5rem;
 }
 
-/* 🎯 Navigation and Header Links */
-header, nav, .navbar, .topbar {
-  color: #ffffff;
+/* 🎯 Navigation Links — default inline (unstyled) */
+nav a, header a, .navbar a, .topbar a {
+  color: #ffffff !important;
+  text-decoration: none;
+  font-weight: 500;
 }
 
-/* 🛡️ Make sure all nav buttons and links are visible even in white boxes */
-header a, nav a, .navbar a, .topbar a,
-header button, nav button, .navbar button {
+/* 💎 Optional: hover effect for clean nav links */
+nav a:hover, header a:hover {
+  text-decoration: underline;
+}
+
+/* 🔘 Button-style links (ONLY for Login/Register via class) */
+.button-link {
   color: #ffffff !important;
-  background-color: transparent !important;
+  background-color: transparent;
   border: 1px solid #ffffff;
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
@@ -60,7 +66,7 @@ header button, nav button, .navbar button {
   transition: background-color 0.2s ease;
 }
 
-header a:hover, nav a:hover, header button:hover, nav button:hover {
+.button-link:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
