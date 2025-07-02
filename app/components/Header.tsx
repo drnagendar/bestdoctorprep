@@ -9,10 +9,8 @@ export default function Header() {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-    });
-    return () => unsubscribe();
+    const unsubscribe = onAuthStateChanged(auth, setUser);
+    return unsubscribe; // clean and simple
   }, []);
 
   const handleLogout = async () => {
