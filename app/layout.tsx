@@ -30,8 +30,10 @@ export default function RootLayout({
           <Header />
 
           {/* Main Content Area */}
-          <main className="flex-1 max-w-5xl mx-auto px-4 py-6 w-full">
-            {children}
+          <main className="flex-1 w-full px-4 py-6">
+            <div className="max-w-7xl mx-auto w-full">
+              {children}
+            </div>
           </main>
 
           {/* Sticky Global Footer */}
