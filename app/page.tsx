@@ -1,7 +1,7 @@
 export default function HomePage() {
   return (
-    <section className="px-4 mt-12">
-      <div className="max-w-7xl mx-auto text-center">
+    <section className="mt-12">
+      <div className="max-w-7xl mx-auto w-full px-6 text-center">
         <h2 className="text-3xl font-semibold mb-4">
           Welcome to <span className="text-blue-600">BestDoctorPrep</span>
         </h2>

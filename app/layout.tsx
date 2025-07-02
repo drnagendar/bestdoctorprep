@@ -26,31 +26,34 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <div className={`flex flex-col min-h-screen ${inter.className}`}>
+          {/* Header */}
           <Header />
 
-          {/* Body Content aligned exactly with Header */}
-          <div className="flex-1 w-full px-6 py-6">
-            <div className="max-w-7xl mx-auto w-full">
+          {/* Main Content Area */}
+          <main className="flex-1">
+            <div className="max-w-7xl w-full mx-auto px-6 py-6">
               {children}
             </div>
-          </div>
+          </main>
 
           {/* Footer */}
           <footer className="text-center text-sm text-gray-500 py-4 border-t w-full">
-            <p className="mb-1 space-x-4">
-              <Link href={DISCLAIMER_LINK} className="hover:underline">
-                Disclaimer
-              </Link>
-              <Link href={PRIVACY_LINK} className="hover:underline">
-                Privacy
-              </Link>
-              <Link href={TERMS_LINK} className="hover:underline">
-                Terms
-              </Link>
-            </p>
-            <p>
-              © {COPYRIGHT_YEAR} {SITE_NAME}. All rights reserved.
-            </p>
+            <div className="max-w-7xl mx-auto px-6">
+              <p className="mb-1 space-x-4">
+                <Link href={DISCLAIMER_LINK} className="hover:underline">
+                  Disclaimer
+                </Link>
+                <Link href={PRIVACY_LINK} className="hover:underline">
+                  Privacy
+                </Link>
+                <Link href={TERMS_LINK} className="hover:underline">
+                  Terms
+                </Link>
+              </p>
+              <p>
+                © {COPYRIGHT_YEAR} {SITE_NAME}. All rights reserved.
+              </p>
+            </div>
           </footer>
         </div>
       </body>
