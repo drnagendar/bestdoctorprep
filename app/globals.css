@@ -1,16 +1,15 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 
-/* Light mode defaults */
+/* 🌞 Light mode defaults */
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: Arial, Helvetica, sans-serif;
+  --font-sans: 'Inter', sans-serif;
   --font-mono: monospace;
 }
 
-/* Dark mode override */
+/* 🌙 Dark mode overrides */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -18,22 +17,21 @@
   }
 }
 
-/* Apply global styles */
+/* 🔧 Base styles */
 body {
   background-color: var(--background);
-  color: var(--foreground);
   font-family: var(--font-sans);
   line-height: 1.6;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
+  padding: 0;
 }
 
-/* Ensure headings, paragraphs, links use foreground color */
-h1, h2, h3, h4, h5, h6,
-p, span, a, li, blockquote {
+/* ✨ Text color only for regular content — NOT headings */
+p, span, li, blockquote, a, strong, em, code {
   color: var(--foreground);
 }
 
-/* Utility classes for 3D transforms */
+/* 🎥 3D utility classes */
 .perspective {
   perspective: 1000px;
 }
