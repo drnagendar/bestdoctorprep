@@ -24,15 +24,15 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-blue-600 text-white shadow-md px-6 py-4">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-        {/* Logo */}
-        <h1 className="text-2xl font-bold tracking-wide">
-          <Link href="/">BestDoctorPrep</Link>
-        </h1>
+    <header className="w-full bg-blue-600 text-white shadow-md">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between px-6 py-4 gap-4">
+        {/* Logo / Title */}
+        <Link href="/" className="text-2xl font-bold tracking-wide text-center sm:text-left">
+          BestDoctorPrep
+        </Link>
 
         {/* Navigation */}
-        <nav className="flex flex-wrap items-center gap-4 justify-center sm:justify-end">
+        <nav className="flex flex-wrap items-center justify-center sm:justify-end gap-4">
           <Link href="/" className="hover:underline">
             Home
           </Link>
@@ -48,7 +48,7 @@ export default function Header() {
 
           {user ? (
             <>
-              <span className="text-sm hidden sm:inline">
+              <span className="text-sm hidden sm:inline-block whitespace-nowrap">
                 Welcome, {user.email}
               </span>
               <button
@@ -62,13 +62,13 @@ export default function Header() {
             <>
               <Link
                 href="/login"
-                className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
+                className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition text-center"
               >
                 Login
               </Link>
               <Link
                 href="/register"
-                className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
+                className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition text-center"
               >
                 Register
               </Link>
