@@ -1,10 +1,9 @@
-/* 🧩 Tailwind First */
-@import "tailwindcss";
+/* 🌐 Tailwind Imports */
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
-/* ❌ Remove Google Font import - handled by next/font */
-// @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
-
-/* 🌞 Light Mode Defaults */
+/* 🌞 Light Mode */
 :root {
   --background: #ffffff;
   --foreground: #3b3b3b;
@@ -12,7 +11,7 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* 🌙 Dark Mode Support */
+/* 🌙 Dark Mode */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -28,7 +27,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: #ffffff;
+    color: var(--foreground);
   }
 }
 
@@ -52,7 +51,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
-  color: var(--foreground); /* Now supports dark mode via variable */
+  color: var(--foreground);
 }
 
 /* 🔗 Links — styled per component */
@@ -60,7 +59,7 @@ a {
   text-decoration: none;
 }
 
-/* 🌀 3D Utility Classes */
+/* 🌀 3D Utility */
 .perspective {
   perspective: 1000px;
 }
