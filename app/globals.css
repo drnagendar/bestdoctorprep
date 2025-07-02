@@ -4,7 +4,7 @@
 /* 🌞 Light Mode Defaults */
 :root {
   --background: #ffffff;
-  --foreground: #3b3b3b; /* Softer text for better readability */
+  --foreground: #3b3b3b;
   --font-sans: 'Inter', sans-serif;
   --font-mono: monospace;
 }
@@ -30,12 +30,12 @@ body {
   line-height: 1.6;
 }
 
-/* ✍️ Regular content text color */
+/* ✍️ Body Content Typography */
 p, span, li, blockquote, a, strong, em, code {
   color: var(--foreground);
 }
 
-/* ✨ White Headings — for top strip and blue sections */
+/* ✨ Headings — Global White */
 h1, h2, h3, h4, h5, h6 {
   color: #ffffff;
   font-weight: 700;
@@ -43,12 +43,12 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.5rem;
 }
 
-/* 🔷 Optional: Ensure navigation bar text is white */
+/* 🎯 Nav + Header Text Always White */
 header, nav, .navbar, .topbar {
   color: #ffffff;
 }
 
-header a, nav a {
+header a, nav a, .navbar a, .topbar a {
   color: #ffffff !important;
 }
 
