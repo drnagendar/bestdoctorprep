@@ -1,19 +1,30 @@
+/* 🧩 Tailwind First */
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 
-/* 🌞 Light Mode */
+/* ❌ Remove Google Font import - handled by next/font */
+// @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+
+/* 🌞 Light Mode Defaults */
 :root {
   --background: #ffffff;
   --foreground: #3b3b3b;
   --font-sans: 'Inter', sans-serif;
-  --font-mono: monospace;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* 🌙 Dark Mode */
+/* 🌙 Dark Mode Support */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+  }
+
+  body {
+    background-color: var(--background);
+  }
+
+  p, span, li, blockquote, strong, em, code {
+    color: var(--foreground);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -25,30 +36,31 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--background);
   font-family: var(--font-sans);
+  background-color: var(--background);
+  color: var(--foreground);
   line-height: 1.6;
 }
 
-/* ✍️ Text styles */
+/* ✍️ Text */
 p, span, li, blockquote, strong, em, code {
   color: var(--foreground);
 }
 
 /* 🔠 Headings */
 h1, h2, h3, h4, h5, h6 {
-  color: #ffffff;
   font-weight: 700;
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
+  color: var(--foreground); /* Now supports dark mode via variable */
 }
 
-/* 💡 DO NOT globally override links — they’re styled per component */
+/* 🔗 Links — styled per component */
 a {
   text-decoration: none;
 }
 
-/* 🌀 3D Utility */
+/* 🌀 3D Utility Classes */
 .perspective {
   perspective: 1000px;
 }
