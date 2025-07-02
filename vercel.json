@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "https://www.bestdoctorprep.in/$1",
+      "has": [
+        {
+          "type": "host",
+          "value": "bestdoctorprep.in"
+        }
+      ],
+      "permanent": true
+    }
+  ]
+}
