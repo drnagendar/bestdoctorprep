@@ -29,14 +29,14 @@ export default function RootLayout({
           {/* Global Header */}
           <Header />
 
-          {/* Main Content Area */}
+          {/* Main Content */}
           <main className="flex-1 w-full px-4 py-6">
             <div className="max-w-7xl mx-auto w-full">
               {children}
             </div>
           </main>
 
-          {/* Sticky Global Footer */}
+          {/* Footer */}
           <footer className="text-center text-sm text-gray-500 py-4 border-t w-full">
             <p className="mb-1 space-x-4">
               <Link href={DISCLAIMER_LINK} className="hover:underline">
