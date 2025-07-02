@@ -26,15 +26,14 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <div className={`flex flex-col min-h-screen ${inter.className}`}>
-          {/* Global Header */}
           <Header />
 
-          {/* Main Content */}
-          <main className="flex-1 w-full px-4 py-6">
+          {/* Body Content aligned exactly with Header */}
+          <div className="flex-1 w-full px-6 py-6">
             <div className="max-w-7xl mx-auto w-full">
               {children}
             </div>
-          </main>
+          </div>
 
           {/* Footer */}
           <footer className="text-center text-sm text-gray-500 py-4 border-t w-full">
