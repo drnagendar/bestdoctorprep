@@ -1,17 +1,15 @@
-/* 🌐 Tailwind Imports */
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* 🌞 Light Mode */
+/* 🌞 Light Mode Variables */
 :root {
   --background: #ffffff;
   --foreground: #3b3b3b;
   --font-sans: 'Inter', sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* 🌙 Dark Mode */
+/* 🌙 Dark Mode Support */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -41,7 +39,7 @@ body {
   line-height: 1.6;
 }
 
-/* ✍️ Text */
+/* ✍️ Typography */
 p, span, li, blockquote, strong, em, code {
   color: var(--foreground);
 }
@@ -54,12 +52,12 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--foreground);
 }
 
-/* 🔗 Links — styled per component */
+/* 🔗 Links — styled in components */
 a {
   text-decoration: none;
 }
 
-/* 🌀 3D Utility */
+/* 🌀 3D Utility Classes */
 .perspective {
   perspective: 1000px;
 }
